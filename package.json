@@ -1,0 +1,15 @@
+{
+  "name": "vue-router-metaguards",
+  "version": "0.0.1",
+  "description": "A vue utility to extand vue-router navigation guards",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Valentin Bailleul",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^2.4.1",
+    "lodash": "^4.17.4"
+  }
+}
