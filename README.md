@@ -1,12 +1,10 @@
 # vue-router-metaguards
 
-## Introduction
-
 Vue official router offers the possibility to hook into the route navigation process under different ways: globally, per-route, or in-component. 
 
 The goal of this module is to provide the following extra per-route hooks: `beforeEnter`, `beforeLeave`, `beforeUpdate`, `afterEnter`, `afterLeave`, `afterUpdate` and `repeatIn`.
 
-## Initialisation
+## Initialization
 
 ```javascript
 import { resolveBeforeGuards, resolveAfterGuards } from 'vue-router-metaguards'
@@ -117,3 +115,7 @@ const router = new Router({
     }]
 })
 ```
+
+## License
+
+vue-router-metaguards is [MIT licensed](https://github.com/ATEME/vue-router-metaguards/blob/master/LICENSE)
