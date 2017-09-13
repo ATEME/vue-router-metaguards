@@ -183,8 +183,8 @@ function repeatIn (to, from) {
     wrapper: action => {
       if (isFunction(action.trigger)) {
         action.trigger(to, from)
-                ? startRepeat(action.handler || action, [to, from], action.delay)
-                : stopRepeat(action.handler || action)
+          ? startRepeat(action.handler || action, [to, from], action.delay)
+          : stopRepeat(action.handler || action)
       }
     },
     to,
