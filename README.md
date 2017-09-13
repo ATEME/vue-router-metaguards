@@ -10,13 +10,14 @@ The goal of this module is to provide the following extra per-route hooks: `befo
 import { resolveBeforeGuards, resolveAfterGuards } from 'vue-router-metaguards'
 import Router from 'vue-router'
 
+// initialize router
 const router = new Router({/* ... */})
 
-// initialize 'before' guards
-router.beforeEach((to, from, next) => resolveBeforeGuards(to, from).then(next).catch(next))
+// initialize 'before' meta-guards
+router.beforeEach(resolveBeforeGuards)
 
-// initialize 'after' guards
-router.afterEach((to, from) => resolveAfterGuards(to, from))
+// initialize 'after' meta-guards
+router.afterEach(resolveAfterGuards)
 ```
 
 ## Getting started

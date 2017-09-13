@@ -1,5 +1,4 @@
 import { isFunction, isObject, isArray, get, difference, intersection, union } from 'lodash'
-import Vue from 'vue'
 import { startRepeat, stopRepeat } from './utils/repeat'
 import { doubleDiffPath } from './utils/objects'
 
@@ -11,14 +10,12 @@ import { doubleDiffPath } from './utils/objects'
  * @param {any} from The source route
  * @returns A promise that will be resolved once every related guard is resolved
  */
-export function resolveBeforeGuards (to, from) {
-  vm.to = to
-  vm.from = from
+export function resolveBeforeGuards (to, from, next) {
   return Promise.all([
-    vm.beforeLeave(),
-    vm.beforeUpdate(),
-    vm.beforeEnter()
-  ])
+    beforeLeave(to, from),
+    beforeUpdate(to, from),
+    beforeEnter(to, from)
+  ]).then(next).catch(next)
 }
 
 /**
@@ -29,100 +26,223 @@ export function resolveBeforeGuards (to, from) {
  * @param {any} from The source route
  */
 export function resolveAfterGuards (to, from) {
-  vm.to = to
-  vm.from = from
-  vm.afterLeave()
-  vm.repeatIn()
-  vm.afterUpdate()
-  vm.afterEnter()
+  afterLeave(to, from)
+  repeatIn(to, from)
+  afterUpdate(to, from)
+  afterEnter(to, from)
 }
 
-const vm = new Vue({
-  data: {
-    to: null,
-    from: null
-  },
+/**
+ * Execute all handlers from a given action
+ *
+ * @param {any} { action, wrapper, to, from }
+ * @returns The resulting promise
+ */
+function executeAction ({ action, wrapper, to, from }) {
+  if (isFunction(action)) {
+    return isFunction(wrapper) ? wrapper(action) : action(to, from)
+  } else if (isArray(action)) {
+    return Promise.all(action.map(a => executeAction({ action: a, wrapper, to, from })))
+  } else if (isObject(action)) {
+    return isFunction(wrapper) ? wrapper(action) : executeAction({ action: action.handler, to, from })
+  }
+}
 
-  methods: {
+/**
+ * Execute all actions with a given name and for given routes
+ *
+ * @param {any} { name, routes, wrapper, to, from }
+ * @returns The resulting promise
+ */
+function executeRoutesActions ({ name, routes, wrapper, to, from }) {
+  return Promise.all(routes.map(route => executeAction({ action: get(route, ['meta', name]), wrapper, to, from })))
+}
 
-    executeAction (action, wrapper) {
-      if (isFunction(action)) {
-        return wrapper ? wrapper(action) : action(this.to, this.from)
-      } else if (isArray(action)) {
-        return Promise.all(action.map(a => this.executeAction(a, wrapper)))
-      } else if (isObject(action)) {
-        return wrapper ? wrapper(action) : this.executeAction(action.handler)
+/**
+ * Execute 'beforeLeave' actions for leaved routes
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function beforeLeave (to, from) {
+  return executeRoutesActions({
+    name: 'beforeLeave',
+    routes: leaved(to, from),
+    to,
+    from
+  })
+}
+
+/**
+ * Execute 'beforeEnter' actions for entered routes
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function beforeEnter (to, from) {
+  return executeRoutesActions({
+    name: 'beforeEnter',
+    routes: entered(to, from),
+    to,
+    from
+  })
+}
+
+/**
+ * Execute 'beforeUpdate' actions for updated routes
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function beforeUpdate (to, from) {
+  return executeRoutesActions({
+    name: 'beforeUpdate',
+    routes: updated(to, from),
+    to,
+    from
+  })
+}
+
+/**
+ * Execute 'afterLeave' actions for leaved routes
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function afterLeave (to, from) {
+  return executeRoutesActions({
+    name: 'afterLeave',
+    routes: leaved(to, from),
+    to,
+    from
+  })
+}
+
+/**
+ * Execute 'afterEnter' actions for entered routes
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function afterEnter (to, from) {
+  return executeRoutesActions({
+    name: 'afterEnter',
+    routes: entered(to, from),
+    to,
+    from
+  })
+}
+
+/**
+ * Execute 'afterUpdate' actions for updated routes
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function afterUpdate (to, from) {
+  return executeRoutesActions({
+    name: 'afterUpdate',
+    routes: updated(to, from),
+    to,
+    from
+  })
+}
+
+/**
+ * Start repetition for entered routes
+ * Stop repetition for leaved routes
+ * Update repetition for stayed routes
+ *
+ * @param {any} to
+ * @param {any} from
+ */
+function repeatIn (to, from) {
+  // If a route is entered, check if trigger for repeating action is matched and start repeating
+  executeRoutesActions({
+    name: 'repeatIn',
+    routes: entered(to, from),
+    wrapper: action => {
+      if (!isFunction(action.trigger) || action.trigger(to, from)) {
+        startRepeat(action.handler || action, [to, from], action.delay)
       }
     },
+    to,
+    from
+  })
 
-    executeRoutesActions (name, routes, wrapper) {
-      return Promise.all(routes.map(route => this.executeAction(get(route, ['meta', name]), wrapper)))
+  // If a route change is triggered, but the route is still matched, start or stop repeating according to trigger
+  executeRoutesActions({
+    name: 'repeatIn',
+    routes: stayed(to, from),
+    wrapper: action => {
+      if (isFunction(action.trigger)) {
+        action.trigger(to, from)
+                ? startRepeat(action.handler || action, [to, from], action.delay)
+                : stopRepeat(action.handler || action)
+      }
     },
+    to,
+    from
+  })
 
-    beforeLeave () {
-      return this.executeRoutesActions('beforeLeave', this.leaved)
-    },
+  // If a route is leaved, stop repeating
+  executeRoutesActions({
+    name: 'repeatIn',
+    routes: leaved(to, from),
+    wrapper: action => stopRepeat(action.handler || action),
+    to,
+    from
+  })
+}
 
-    beforeEnter () {
-      return this.executeRoutesActions('beforeEnter', this.entered)
-    },
+/**
+ * Returns the list of leaved routes given source and destination
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function leaved (to, from) {
+  return difference(from.matched, to.matched)
+}
 
-    beforeUpdate () {
-      return this.executeRoutesActions('beforeUpdate', this.updated)
-    },
+/**
+ * Returns the list of updated routes given source and destination
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function updated (to, from) {
+  let updatedParams = union.apply(undefined, doubleDiffPath(from.params, to.params))
+  return stayed(to, from).filter(route => route.regex.keys.find(key => updatedParams.indexOf(key.name) !== -1))
+}
 
-    afterLeave () {
-      return this.executeRoutesActions('afterLeave', this.leaved)
-    },
+/**
+ * Returns the list of entered routes given source and destination
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function entered (to, from) {
+  return difference(to.matched, from.matched)
+}
 
-    afterEnter () {
-      return this.executeRoutesActions('afterEnter', this.entered)
-    },
+/**
+ * Returns the list of stayed routes given a source and destination
+ *
+ * @param {any} to
+ * @param {any} from
+ * @returns
+ */
+function stayed (to, from) {
+  return intersection(to.matched, from.matched)
+}
 
-    afterUpdate () {
-      return this.executeRoutesActions('afterUpdate', this.updated)
-    },
-
-    repeatIn () {
-        // If a route is entered, check if trigger for repeating action is matched and start repeating
-      this.executeRoutesActions('repeatIn', this.entered, action => {
-        if (!isFunction(action.trigger) || action.trigger(this.to, this.from)) {
-          startRepeat(action.handler || action, [this.to, this.from], action.delay)
-        }
-      })
-
-        // If a route change is triggered, but the route is still matched, start or stop repeating according to trigger
-      this.executeRoutesActions('repeatIn', this.stayed, action => {
-        if (isFunction(action.trigger)) {
-          action.trigger(this.to, this.from)
-              ? startRepeat(action.handler || action, [this.to, this.from], action.delay)
-              : stopRepeat(action.handler || action)
-        }
-      })
-
-        // If a route is leaved, stop repeating
-      this.executeRoutesActions('repeatIn', this.leaved, action => stopRepeat(action.handler || action))
-    }
-  },
-
-  computed: {
-
-    leaved () {
-      return difference(this.from.matched, this.to.matched)
-    },
-
-    updated () {
-      let updatedParams = union.apply(undefined, doubleDiffPath(this.from.params, this.to.params))
-      return intersection(this.to.matched, this.from.matched)
-          .filter(route => route.regex.keys.find(key => updatedParams.indexOf(key.name) !== -1))
-    },
-
-    entered () {
-      return difference(this.to.matched, this.from.matched)
-    },
-
-    stayed () {
-      return difference(this.to.matched, this.entered)
-    }
-  }
-})

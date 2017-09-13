@@ -9,7 +9,6 @@
   "author": "Valentin Bailleul",
   "license": "MIT",
   "peerDependencies": {
-    "vue": "^2.4.1",
     "lodash": "^4.17.4"
   }
 }
