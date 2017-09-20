@@ -4,6 +4,12 @@ Vue official router offers the possibility to hook into the route navigation pro
 
 The goal of this module is to provide the following extra per-route hooks: `beforeEnter`, `beforeLeave`, `beforeUpdate`, `afterEnter`, `afterLeave`, `afterUpdate` and `repeatIn`.
 
+## Installation
+
+```bash
+npm install --save vue-router-metaguards
+```
+
 ## Initialization
 
 ```javascript
@@ -116,6 +122,10 @@ const router = new Router({
   }]
 })
 ```
+
+## API
+
+Full API can be found [here](https://github.com/ATEME/vue-router-metaguards/blob/master/API.md)
 
 ## License
 

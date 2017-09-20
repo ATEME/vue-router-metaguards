@@ -3,7 +3,7 @@ import { each, isObject, union, isEqual } from 'lodash'
 /**
  * Compute the differences between two objects
  *
- * @export
+ * @private
  * @param {any} a The first object
  * @param {any} b The second object
  * @param {any} [res=[]] The result
@@ -25,7 +25,7 @@ export function diffPath (a, b, res = [], sub = []) {
 /**
  * Compute the differences between two objects, in both directions
  *
- * @export
+ * @private
  * @param {any} a The first object
  * @param {any} b The second object
  * @returns The array of paths formatted as arrays pointing to differences
