@@ -3,7 +3,7 @@
 ## vue-router-metaguards
 
 * [vue-router-metaguards](#module_vue-router-metaguards)
-    * [`.resolveBeforeGuards(to, from)`](#module_vue-router-metaguards.resolveBeforeGuards) ⇒ <code>Promise</code>
+    * [`.resolveBeforeGuards(to, from, next)`](#module_vue-router-metaguards.resolveBeforeGuards) ⇒ <code>Promise</code>
     * [`.resolveAfterGuards(to, from)`](#module_vue-router-metaguards.resolveAfterGuards)
 
 
@@ -11,7 +11,7 @@
 
 <a name="module_vue-router-metaguards.resolveBeforeGuards"></a>
 
-### `vue-router-metaguards.resolveBeforeGuards(to, from)` ⇒ <code>Promise</code>
+### `vue-router-metaguards.resolveBeforeGuards(to, from, next)` ⇒ <code>Promise</code>
 Resolve and execute every navigation guards to run before leaving 'from' and entering 'to'
 
 **Kind**: static method of [<code>vue-router-metaguards</code>](#module_vue-router-metaguards)  
@@ -28,6 +28,9 @@ Resolve and execute every navigation guards to run before leaving 'from' and ent
 </td>
     </tr><tr>
     <td>from</td><td><code><a href="#Route">Route</a></code></td><td><p>the source route</p>
+</td>
+    </tr><tr>
+    <td>next</td><td><code>function</code></td><td><p>the callback privided by the official beforeEach method</p>
 </td>
     </tr>  </tbody>
 </table>

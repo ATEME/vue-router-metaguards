@@ -1,0 +1,1 @@
+jsdoc2md * **/** --separators --name-format --no-gfm -m none -g none > API.md

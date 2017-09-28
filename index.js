@@ -9,6 +9,7 @@ import { doubleDiffPath } from './utils/objects'
  * @example router.beforeEach(resolveBeforeGuards)
  * @param {Route} to - the destination route
  * @param {Route} from - the source route
+ * @param {Function} next - the callback privided by the official beforeEach method
  * @returns {Promise} A promise that will be resolved once every related guard is resolved
  */
 export function resolveBeforeGuards (to, from, next) {

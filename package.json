@@ -1,6 +1,6 @@
 {
   "name": "vue-router-metaguards",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A vue utility to extand vue-router navigation guards",
   "main": "index.js",
   "scripts": {

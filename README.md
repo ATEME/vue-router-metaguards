@@ -34,15 +34,28 @@ A hook has to be defined in the `meta` property of a route. In its simplest use,
 
 const router = new Router({
   routes: [{
-    path: '/app',
+    path: 'my-route',
     meta: {
-      beforeEnter: (to, from) => { /* Code here will be executed before entering a new route */ },
-      beforeUpdate: (to, from) => { /* Code here will be executed before updating a resolved route */ },
-      beforeLeave: (to, from) => { /* Code here will be executed before leaving a resolved route */ },
-      afterEnter: (to, from) => { /* Code here will be executed after entering a new route */ },
-      afterUpdate: (to, from) => { /* Code here will be executed after updating a resolved route */ },
-      afterLeave: (to, from) => { /* Code here will be executed after leaving a resolved route */ },
-      repeatIn: (to, from) => { /* Code here will be executed every 5s as long as route is resolved */ },
+      // Will be executed before entering new route
+      beforeEnter: (to, from) => { /* ... */ },
+
+      // Will be executed before updating a resolved route
+      beforeUpdate: (to, from) => { /* ... */ },
+
+      // Will be executed before leaving a resolved route
+      beforeLeave: (to, from) => { /* ... */ },
+
+      // Will be executed after entering a new route
+      afterEnter: (to, from) => { /* ... */ },
+
+      // Will be executed after updating a resolved route
+      afterUpdate: (to, from) => { /* ... */ },
+
+      // Will be executed after leaving a resolved route
+      afterLeave: (to, from) => { /* ... */ },
+
+      // Will be executed every 5s as long as route is resolved
+      repeatIn: (to, from) => { /* ... */ },
     }
   }]
 })
