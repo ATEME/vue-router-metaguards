@@ -12,12 +12,10 @@ import { doubleDiffPath } from './utils/objects'
  * @param {Function} next - the callback privided by the official beforeEach method
  * @returns {Promise} A promise that will be resolved once every related guard is resolved
  */
-export function resolveBeforeGuards (to, from, next) {
-  return Promise.all([
-    beforeLeave(to, from),
-    beforeUpdate(to, from),
-    beforeEnter(to, from)
-  ]).then(next).catch(next)
+export function resolveBeforeGuards(to, from, next) {
+  return Promise.all([beforeLeave(to, from), beforeUpdate(to, from), beforeEnter(to, from)])
+    .then(next)
+    .catch(next)
 }
 
 /**
@@ -27,7 +25,7 @@ export function resolveBeforeGuards (to, from, next) {
  * @param {Route} to - the destination route
  * @param {Route} from - the source route
  */
-export function resolveAfterGuards (to, from) {
+export function resolveAfterGuards(to, from) {
   afterLeave(to, from)
   repeatIn(to, from)
   afterUpdate(to, from)
@@ -41,7 +39,7 @@ export function resolveAfterGuards (to, from) {
  * @param {any} { action, wrapper, to, from }
  * @returns {Promise} The resulting promise
  */
-function executeAction ({ action, wrapper, to, from }) {
+function executeAction({ action, wrapper, to, from }) {
   if (isFunction(action)) {
     return isFunction(wrapper) ? wrapper(action) : action(to, from)
   } else if (isArray(action)) {
@@ -58,7 +56,7 @@ function executeAction ({ action, wrapper, to, from }) {
  * @param {any} { name, routes, wrapper, to, from }
  * @returns {Promise} The resulting promise
  */
-function executeRoutesActions ({ name, routes, wrapper, to, from }) {
+function executeRoutesActions({ name, routes, wrapper, to, from }) {
   return Promise.all(routes.map(route => executeAction({ action: get(route, ['meta', name]), wrapper, to, from })))
 }
 
@@ -70,7 +68,7 @@ function executeRoutesActions ({ name, routes, wrapper, to, from }) {
  * @param {Route} from - the source route
  * @returns {Promise}
  */
-function beforeLeave (to, from) {
+function beforeLeave(to, from) {
   return executeRoutesActions({
     name: 'beforeLeave',
     routes: leaved(to, from),
@@ -87,7 +85,7 @@ function beforeLeave (to, from) {
  * @param {Route} from - the source route
  * @returns {Promise}
  */
-function beforeEnter (to, from) {
+function beforeEnter(to, from) {
   return executeRoutesActions({
     name: 'beforeEnter',
     routes: entered(to, from),
@@ -104,7 +102,7 @@ function beforeEnter (to, from) {
  * @param {Route} from - the source route
  * @returns {Promise}
  */
-function beforeUpdate (to, from) {
+function beforeUpdate(to, from) {
   return executeRoutesActions({
     name: 'beforeUpdate',
     routes: updated(to, from),
@@ -120,7 +118,7 @@ function beforeUpdate (to, from) {
  * @param {Route} to - the destination route
  * @param {Route} from - the source route
  */
-function afterLeave (to, from) {
+function afterLeave(to, from) {
   executeRoutesActions({
     name: 'afterLeave',
     routes: leaved(to, from),
@@ -136,7 +134,7 @@ function afterLeave (to, from) {
  * @param {Route} to - the destination route
  * @param {Route} from - the source route
  */
-function afterEnter (to, from) {
+function afterEnter(to, from) {
   executeRoutesActions({
     name: 'afterEnter',
     routes: entered(to, from),
@@ -152,7 +150,7 @@ function afterEnter (to, from) {
  * @param {Route} to - the destination route
  * @param {Route} from - the source route
  */
-function afterUpdate (to, from) {
+function afterUpdate(to, from) {
   executeRoutesActions({
     name: 'afterUpdate',
     routes: updated(to, from),
@@ -170,7 +168,7 @@ function afterUpdate (to, from) {
  * @param {Route} to - the destination route
  * @param {Route} from - the source route
  */
-function repeatIn (to, from) {
+function repeatIn(to, from) {
   // If a route is entered, check if trigger for repeating action is matched and start repeating
   executeRoutesActions({
     name: 'repeatIn',
@@ -217,7 +215,7 @@ function repeatIn (to, from) {
  * @param {Route} from - the source route
  * @returns {Array}
  */
-function leaved (to, from) {
+function leaved(to, from) {
   return difference(from.matched, to.matched)
 }
 
@@ -229,8 +227,8 @@ function leaved (to, from) {
  * @param {Route} from - the source route
  * @returns {Array}
  */
-function updated (to, from) {
-  let updatedParams = union.apply(undefined, doubleDiffPath(from.params, to.params))
+function updated(to, from) {
+  const updatedParams = union.apply(undefined, doubleDiffPath(from.params, to.params))
   return stayed(to, from).filter(route => route.regex.keys.find(key => updatedParams.indexOf(key.name) !== -1))
 }
 
@@ -242,7 +240,7 @@ function updated (to, from) {
  * @param {Route} from - the source route
  * @returns {Array}
  */
-function entered (to, from) {
+function entered(to, from) {
   return difference(to.matched, from.matched)
 }
 
@@ -254,7 +252,6 @@ function entered (to, from) {
  * @param {Route} from - the source route
  * @returns {Array}
  */
-function stayed (to, from) {
+function stayed(to, from) {
   return intersection(to.matched, from.matched)
 }
-

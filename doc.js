@@ -1,7 +1,7 @@
- /**
-  * @typedef {object} Route
-  * @see https://router.vuejs.org/en/api/route-object.html
-  */
+/**
+ * @typedef {object} Route
+ * @see https://router.vuejs.org/en/api/route-object.html
+ */
 
 /**
  * @typedef {object} meta

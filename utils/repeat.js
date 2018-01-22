@@ -14,7 +14,7 @@ const repeating = []
  * @param {any} [args=[]] The arguments to give to the repeated method
  * @param {number} [delay=5000] The delay between each repetition
  */
-export function startRepeat (handler, args = [], delay = 5000) {
+export function startRepeat(handler, args = [], delay = 5000) {
   // store handler state
   const ref = {
     handler: handler,
@@ -26,7 +26,11 @@ export function startRepeat (handler, args = [], delay = 5000) {
 
   // start repeating
   const next = () => setTimeout(repeat, delay)
-  const repeat = () => !ref.stopped && Promise.resolve(handler.apply(null, args)).then(next).catch(next)
+  const repeat = () =>
+    !ref.stopped &&
+    Promise.resolve(handler.apply(null, args))
+      .then(next)
+      .catch(next)
   repeat()
 }
 
@@ -36,6 +40,8 @@ export function startRepeat (handler, args = [], delay = 5000) {
  * @private
  * @param {any} handler The method to stop repeating
  */
-export function stopRepeat (handler) {
-  remove(repeating, ref => ref.handler === handler).forEach(ref => { ref.stopped = true })
+export function stopRepeat(handler) {
+  remove(repeating, ref => ref.handler === handler).forEach(ref => {
+    ref.stopped = true
+  })
 }
