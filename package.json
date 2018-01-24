@@ -1,7 +1,7 @@
 {
   "name": "vue-router-metaguards",
   "version": "0.0.3",
-  "description": "A vue utility to extand vue-router navigation guards",
+  "description": "A vue utility to extand vue-router navigation guards with the meta attribute",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
