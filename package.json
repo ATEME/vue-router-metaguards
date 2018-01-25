@@ -2,14 +2,29 @@
   "name": "vue-router-metaguards",
   "version": "0.0.3",
   "description": "A vue utility to extand vue-router navigation guards with the meta attribute",
-  "main": "index.js",
+  "main": "dist/bundle.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf dist",
+    "build": "npm run clean && webpack --config build/webpack.conf.js"
   },
   "author": "Valentin Bailleul",
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "lodash": "^4.17.4"
+  },
+  "babel": {
+    "presets": [
+      "stage-2"
+    ]
+  },
+  "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^7.1.1",
+    "babel-preset-stage-2": "^6.22.0",
+    "peer-deps-externals-webpack-plugin": "^1.0.2",
+    "rimraf": "^2.6.2",
+    "uglifyjs-webpack-plugin": "^1.1.6",
+    "webpack": "^3.6.0"
   },
   "repository": {
     "type": "git",
